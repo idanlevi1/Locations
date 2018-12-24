@@ -43,9 +43,7 @@ class Header extends React.Component {
         <View style={styles.container}>
         {backOption ? 
           <TouchableOpacity onPress={navigation.goBack()}>
-              <MonoText style={{ color: BRANDTS.one, fontSize: 18 }}>
-              Back
-              </MonoText>
+            <MonoText style={{ color: BRANDTS.one, fontSize: 18 }}>Back</MonoText>
           </TouchableOpacity>
           :
           <View/>

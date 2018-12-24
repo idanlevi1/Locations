@@ -1,7 +1,7 @@
 import { SET_CATEGORIES, ADD_CATEGORY, EDIT_CATEGORY, DELETE_CATEGORY } from "./categoriesActions";
 
 const initalState = {
-  categories: [{name:'ll11'}]
+  categories: []
 };
 
 export default (state = initalState, action) => {

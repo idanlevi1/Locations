@@ -10,13 +10,12 @@ class Categories extends React.Component {
   };
 
   deleteCategoryHandle = (element) => {
-    let elementIndex = this.props.categories.findIndex((category) => category.name === element.name)
+    const elementIndex = this.props.categories.findIndex((category) => category.name === element.name)
     this.props.onDeleteCategory(elementIndex);
   }
 
   editCategoryHandle = (oldItem,NewItem) => {
-    let itemIndex = this.props.categories.findIndex((category) => category.name === oldItem.name)
-    console.log('editCategoryHandle',itemIndex, NewItem)
+    const itemIndex = this.props.categories.findIndex((category) => category.name === oldItem.name)
     this.props.onEditCategory(itemIndex,NewItem);
   }
 
@@ -31,7 +30,6 @@ class Categories extends React.Component {
 }
 
 const mapStateToProps = state => {
-  console.log('mapState[categories]:', state.categories.categories)
   return {
       categories: state.categories.categories,
   }

@@ -14,7 +14,7 @@ export default class App extends React.Component {
   };
 
   render() {
-    persistor.purge()
+    // persistor.purge() //Delete all asyncStorage
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
       return (
         <AppLoading

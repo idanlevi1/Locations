@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, StyleSheet, KeyboardAvoidingView, View } from 'react-native';
+import { Modal, StyleSheet, KeyboardAvoidingView, View, Picker, ScrollView } from 'react-native';
 import { MonoText } from './StyledText';
 import Layout from '../constants/Layout';
 import { BRANDTS } from "../constants/Colors";
@@ -14,13 +14,12 @@ export class ModalStyled extends React.Component {
     location:{
       name: '',
       address: '',
-      coordinates: {latitude: 0, longitude: 0},
-      category: 'food',
+      coordinates: {latitude: '', longitude: ''},
+      category: '',
     }
   }
 
   componentDidMount = () => {
-    console.log('CURR->>>>:',this.props.action,Types.LOCATIONS,this.props.type)
     if(this.props.action === 'Edit'){
       switch(this.props.type) {
         case Types.CATEGORIES:
@@ -45,8 +44,7 @@ export class ModalStyled extends React.Component {
         return (location['name'] == '' ||
         location['address'] == '' ||
         location['coordinates'] && location['coordinates']['latitude'] == '' ||
-        location['coordinates'] && location['coordinates']['longitude'] == '' ||
-        location['category'] == '')
+        location['coordinates'] && location['coordinates']['longitude'] == '')
       default:
         return false;
     }
@@ -63,6 +61,8 @@ export class ModalStyled extends React.Component {
         break;
       case Types.LOCATIONS:
         item = this.state.location;
+        if(this.state.location['category']==='')
+          item['category'] = this.props.categories[0].name;
         this.setState({location: ''})
       default:
         break;
@@ -107,21 +107,32 @@ export class ModalStyled extends React.Component {
           <MonoText style={styles.subtitle}>Coordinates</MonoText>
           <View style={styles.coordinates}>
             <TextInputMono
-            value={this.state.location['latitude']}
+            value={this.state.location.coordinates['latitude'].toString()}
             placeholder={'Lat'}
             style={[styles.input,styles.latlng]}
             maxLength={6}
+            keyboardType={'decimal-pad'}
             onChangeText={(input) => this.setState(prevState => ({location: {...prevState.location, coordinates: { ...prevState.location.coordinates, latitude: input}}}))}
             />
             <TextInputMono
-            value={this.state.location['longitude']}
+            value={this.state.location.coordinates['longitude'].toString()}
             placeholder={'lng'}
             style={[styles.input,styles.latlng]}
             maxLength={6}
+            keyboardType={'decimal-pad'}
             onChangeText={(input) => this.setState(prevState => ({location: {...prevState.location, coordinates: { ...prevState.location.coordinates ,longitude: input}}}))}
             />
           </View>
-          <MonoText style={styles.subtitle}>Categoty</MonoText>
+          <View style={styles.coordinates}>
+            <MonoText style={styles.subtitle}>Categoty</MonoText>
+            <Picker
+            style={styles.picker}
+            selectedValue={this.state.location['category']}
+            onValueChange={item =>{this.setState(prevState => ({location: {...prevState.location, category: item}}))}}>
+                {this.props.categories.map(
+                  (category,index)=><Picker.Item key={index} label={category.name} value={category.name}/>)}
+            </Picker>
+          </View>
         </React.Fragment>
         )
       default:
@@ -139,28 +150,30 @@ export class ModalStyled extends React.Component {
         onRequestClose={() => {
           Alert.alert('Modal has been closed.');
         }}>
-        <KeyboardAvoidingView style={[styles.container,type===Types.CATEGORIES && {height: Layout.window.height * .5}]} behavior="padding">
-        <ButtonMono 
-        _backgroundColor={'transparent'} 
-        _color={BRANDTS.three}
-        _fontSize={22}
-        _padding={5}
-        _text={'X'}
-        style={styles.closeButton}
-        onClick={setModalVisible}
-        disabled={false}
-        />
-        <MonoText style={styles.title}>{action} {type}</MonoText>
-        {this.InputsElement()}
-        <ButtonMono 
-        _backgroundColor={this.canAction() ? BRANDTS.four : BRANDTS.one} 
-        _color={BRANDTS.three}
-        _fontSize={18}
-        _text={action}
-        onClick={() => {this.actionItem();}}
-        disabled={this.canAction()}
-        />
-        </KeyboardAvoidingView>
+        <ScrollView>
+          <KeyboardAvoidingView style={[styles.container,type===Types.CATEGORIES && {height: Layout.window.height * .5}]} behavior="padding">
+            <ButtonMono 
+            _backgroundColor={'transparent'} 
+            _color={BRANDTS.three}
+            _fontSize={22}
+            _padding={5}
+            _text={'X'}
+            style={styles.closeButton}
+            onClick={setModalVisible}
+            disabled={false}
+            />
+            <MonoText style={styles.title}>{action} {type}</MonoText>
+            {this.InputsElement()}
+            <ButtonMono 
+            _backgroundColor={this.canAction() ? BRANDTS.four : BRANDTS.one} 
+            _color={BRANDTS.three}
+            _fontSize={18}
+            _text={action}
+            onClick={() => {this.actionItem();}}
+            disabled={this.canAction()}
+            />
+          </KeyboardAvoidingView>
+        </ScrollView>
       </Modal>
     );  
   }
@@ -220,6 +233,14 @@ const styles = StyleSheet.create({
     width: Layout.window.width * .25,
     paddingHorizontal: 2,
     marginHorizontal: 5,
-  }
+  },
+  picker:{ 
+    height: 50, 
+    width: 100,
+    backgroundColor: BRANDTS.three,
+    color: BRANDTS.two,
+    borderRadius:15,
+    borderWidth:1,
+  },
   });
   
