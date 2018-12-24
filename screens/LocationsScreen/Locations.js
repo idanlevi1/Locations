@@ -10,12 +10,12 @@ class Locations extends React.Component {
   };
 
   deleteLocationHandle = (element) => {
-    let elementIndex = this.props.locations.findIndex((location) => location.name === element.name)
+    const elementIndex = this.props.locations.findIndex((location) => location.name === element.name)
     this.props.onDeleteLocation(elementIndex);
   }
 
   editLocationHandle = (oldItem,NewItem) => {
-    let itemIndex = this.props.locations.findIndex((location) => location.name === oldItem.name)
+    const itemIndex = this.props.locations.findIndex((location) => location.name === oldItem.name)
     this.props.onEditLocation(itemIndex,NewItem);
   }
 
@@ -32,7 +32,6 @@ class Locations extends React.Component {
 }
 
 const mapStateToProps = state => {
-  console.log('mapState[locations]:', state.locations.locations)
   return {
       locations: state.locations.locations,
       categories: state.categories.categories
