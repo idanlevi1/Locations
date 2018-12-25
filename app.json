@@ -18,7 +18,12 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.idanlevi.mylocations"
+
+    },
+    "android": {
+      "package": "com.idanlevi.mylocations"
     }
   }
 }

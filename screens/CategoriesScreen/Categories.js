@@ -15,7 +15,9 @@ class Categories extends React.Component {
   }
 
   editCategoryHandle = (oldItem,NewItem) => {
-    const itemIndex = this.props.categories.findIndex((category) => category.name === oldItem.name)
+    console.log('editCategoryHandle',oldItem,NewItem)
+    const itemIndex = this.props.categories.findIndex((category) => category.name === oldItem.name);
+    console.log('itemIndex',itemIndex)
     this.props.onEditCategory(itemIndex,NewItem);
   }
 
@@ -30,6 +32,7 @@ class Categories extends React.Component {
 }
 
 const mapStateToProps = state => {
+  console.log('map',state.categories.categories)
   return {
       categories: state.categories.categories,
   }

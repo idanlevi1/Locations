@@ -80,6 +80,8 @@ export class ModalStyled extends React.Component {
     let item = null;
     switch(this.props.type) {
       case Types.CATEGORIES:
+          console.log('Types.CATEGORIES',this.props.categories)
+
         if(!this.props.categories.map(c=>c.name).includes(this.state.category.name)){
           item = this.state.category;
           this.setState({category: ''})
@@ -90,11 +92,14 @@ export class ModalStyled extends React.Component {
         if(this.state.location['category']==='')
           item['category'] = this.props.categories[0].name;
         this.setState({location: ''})
+        break;
       default:
         break;
     }
+    console.log('itemitemitem', item)
     if(item){
       this.props.onActionItem(item);
+      console.log('onActionItem')
       this.props.setModalVisible();
     }
     else
@@ -180,14 +185,13 @@ export class ModalStyled extends React.Component {
 
   render() {
     const { modalVisible, type, action, setModalVisible } = this.props;
+    console.log('Types.CATEGORIES RENDER',this.props.categories)
     return (
       <Modal
         animationType="slide"
         transparent
         visible={modalVisible}
-        onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
-        }}>
+        onRequestClose={() => {Alert.alert('Modal has been closed.');}}>
         <ScrollView>
           <KeyboardAvoidingView style={[styles.container,type===Types.CATEGORIES && styles.smallModal]} behavior="padding">
             <ButtonMono 

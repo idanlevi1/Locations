@@ -65,12 +65,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 52,
-    color: BRANDTS.light,
+    color: BRANDTS.darkSec,
     fontWeight: "500"
   },
   subtitle: {
     fontSize: 26,
-    color: BRANDTS.darkSec
+    color: BRANDTS.light
   },
   logo:{
     height: Layout.window.height * .22,

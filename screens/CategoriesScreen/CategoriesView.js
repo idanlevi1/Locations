@@ -39,6 +39,7 @@ class CategoriesView extends React.Component {
     }
 
     onEditCategoryAction = (newItem) => {
+        console.log('inside', this.state.currentItem,newItem)
         this.props.editCategoryHandle(this.state.currentItem,newItem)
     }
 
@@ -67,10 +68,11 @@ class CategoriesView extends React.Component {
                 </ScrollView>
                 }
                 {this.state.modalVisible &&
-                <ModalStyled 
+                <ModalStyled
                 modalVisible={this.state.modalVisible} 
                 type={'Categories'}
                 action={'Edit'}
+                categories={categories}
                 setModalVisible={this.setModalVisibleHandle}
                 onActionItem={this.onEditCategoryAction}
                 currentItem={this.state.currentItem}/>
