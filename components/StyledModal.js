@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, StyleSheet, KeyboardAvoidingView, View, Picker, ScrollView } from 'react-native';
+import { Modal, StyleSheet, KeyboardAvoidingView, View, Picker, ScrollView, ActivityIndicator } from 'react-native';
 import { MonoText } from './StyledText';
 import Layout from '../constants/Layout';
 import { BRANDTS } from "../constants/Colors";
@@ -7,6 +7,8 @@ import { ButtonMono } from '../components/StyledButton';
 import { TextInputMono } from '../components/StyledTextInput';
 import { Types } from '../constants/Enums';
 import Toast from 'react-native-simple-toast';
+import MapView,{Marker} from 'react-native-maps';
+import { Location, Permissions } from 'expo';
 
 export class ModalStyled extends React.Component {
   state = {
@@ -16,35 +18,59 @@ export class ModalStyled extends React.Component {
       address: '',
       coordinates: {latitude: '', longitude: ''},
       category: '',
-    }
+    },
+    userLocation: null,
   }
 
   componentDidMount = () => {
-    if(this.props.action === 'Edit'){
-      switch(this.props.type) {
-        case Types.CATEGORIES:
-          this.setState({category: this.props.currentItem || ''})
-          break;
-        case Types.LOCATIONS:
-          this.setState({location: this.props.currentItem || ''})
-          
-          break;
-        default:
-          break;
+    const { action, type, currentItem } = this.props;
+    if(action === 'Edit' && type === Types.CATEGORIES)
+      this.setState({category: currentItem || ''})
+    if(type === Types.LOCATIONS){
+      if(action === 'Edit'){
+        const userLocation = {
+          latitude: Number(currentItem.coordinates.latitude),
+          longitude: Number(currentItem.coordinates.longitude)
+        }
+        this.setState({location: currentItem || '', userLocation})
       }
+      else
+        this._getLocationAsync();
     }
   }
   
+  _getLocationAsync = async () => {
+    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status !== 'granted'){
+      Toast.show('location permissin error')
+      this.props.setModalVisible();
+    }
+    const providerStatus = await Location.getProviderStatusAsync()
+    if(providerStatus.locationServicesEnabled){
+      const location = await Location.getCurrentPositionAsync({enableHighAccuracy:true});
+      const userLocation = {
+        latitude: location.coords.latitude, 
+        longitude: location.coords.longitude
+      }
+      this.setState(prevState => ({
+        userLocation,
+        location: {...prevState.location,
+          coordinates: { ...prevState.location.coordinates, ...userLocation}}
+        }))
+    }
+    else{
+      Toast.show('Please enable location access on your device')
+      this.props.setModalVisible();
+    }
+  };
+
   canAction = () => {
     switch(this.props.type) {
       case Types.CATEGORIES:
         return this.state.category['name'] == '';
       case Types.LOCATIONS:
         const {location} = this.state;
-        return (location['name'] == '' ||
-        location['address'] == '' ||
-        location['coordinates'] && location['coordinates']['latitude'] == '' ||
-        location['coordinates'] && location['coordinates']['longitude'] == '')
+        return location['name'] == '' || location['address'] == '';
       default:
         return false;
     }
@@ -106,22 +132,25 @@ export class ModalStyled extends React.Component {
           />
           <MonoText style={styles.subtitle}>Coordinates</MonoText>
           <View style={styles.coordinates}>
-            <TextInputMono
-            value={this.state.location.coordinates['latitude'].toString()}
-            placeholder={'Lat'}
-            style={[styles.input,styles.latlng]}
-            maxLength={6}
-            keyboardType={'decimal-pad'}
-            onChangeText={(input) => this.setState(prevState => ({location: {...prevState.location, coordinates: { ...prevState.location.coordinates, latitude: input}}}))}
-            />
-            <TextInputMono
-            value={this.state.location.coordinates['longitude'].toString()}
-            placeholder={'lng'}
-            style={[styles.input,styles.latlng]}
-            maxLength={6}
-            keyboardType={'decimal-pad'}
-            onChangeText={(input) => this.setState(prevState => ({location: {...prevState.location, coordinates: { ...prevState.location.coordinates ,longitude: input}}}))}
-            />
+          {this.state.userLocation ?
+          <MapView
+          style={styles.mapContainer}
+          onPress={this.onPressLocation}
+          region={{
+            ...this.state.userLocation,
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005,
+          }}>
+            <MapView.Marker
+            coordinate={{...this.state.userLocation}}
+            title={"Your Location"}/>
+          </MapView>
+          : 
+          <View style={styles.loadingContainer}>
+            <MonoText style={styles.loadingText}>Loading Map...</MonoText>
+            <ActivityIndicator size="large" color={BRANDTS.dark} />
+          </View>
+          }
           </View>
           <View style={styles.coordinates}>
             <MonoText style={styles.subtitle}>Categoty</MonoText>
@@ -140,6 +169,15 @@ export class ModalStyled extends React.Component {
     }
   }
 
+  onPressLocation = (e) => {
+    const {latitude, longitude} = e.nativeEvent.coordinate;
+    this.setState(prevState => ({
+      userLocation: { latitude, longitude },
+      location: {...prevState.location, 
+        coordinates: { ...prevState.location.coordinates, latitude, longitude}}
+      }))
+  }
+
   render() {
     const { modalVisible, type, action, setModalVisible } = this.props;
     return (
@@ -151,27 +189,26 @@ export class ModalStyled extends React.Component {
           Alert.alert('Modal has been closed.');
         }}>
         <ScrollView>
-          <KeyboardAvoidingView style={[styles.container,type===Types.CATEGORIES && {height: Layout.window.height * .5}]} behavior="padding">
+          <KeyboardAvoidingView style={[styles.container,type===Types.CATEGORIES && styles.smallModal]} behavior="padding">
             <ButtonMono 
             _backgroundColor={'transparent'} 
-            _color={BRANDTS.three}
+            _color={BRANDTS.light}
             _fontSize={22}
             _padding={5}
             _text={'X'}
             style={styles.closeButton}
             onClick={setModalVisible}
-            disabled={false}
-            />
+            disabled={false}/>
             <MonoText style={styles.title}>{action} {type}</MonoText>
             {this.InputsElement()}
             <ButtonMono 
-            _backgroundColor={this.canAction() ? BRANDTS.four : BRANDTS.one} 
-            _color={BRANDTS.three}
+            _backgroundColor={this.canAction() ? BRANDTS.lightSec : BRANDTS.dark} 
+            _color={BRANDTS.light}
             _fontSize={18}
             _text={action}
+            style={{marginBottom: 10}}
             onClick={() => {this.actionItem();}}
-            disabled={this.canAction()}
-            />
+            disabled={this.canAction()}/>
           </KeyboardAvoidingView>
         </ScrollView>
       </Modal>
@@ -182,17 +219,15 @@ export class ModalStyled extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 0,
-    backgroundColor: '#FFF',
-    justifyContent: 'center',
+    flex: 1,
+    justifyContent: 'space-around',
     alignItems: 'center',
     alignSelf: 'center',
-    marginTop: Layout.window.height * .05,
-    height: Layout.window.height * .8,
-    width: Layout.window.width * .8,
-    backgroundColor: BRANDTS.two,
+    marginTop: Layout.window.height * .025,
+    width: Layout.window.width * .9,
+    backgroundColor: BRANDTS.primary,
+    borderColor: BRANDTS.dark,
     borderWidth: 3,
-    borderColor: BRANDTS.four,
     borderRadius: 10,
   },
   flatview:{
@@ -202,45 +237,60 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: "500",
     textAlign: 'center',
-    marginVertical: 20,
+    padding: 10,
+    marginVertical: 2,
   },
   subtitle: {
     fontSize: 18,
     textAlign: 'center',
-    padding: 10,
-    color: BRANDTS.one,
+    padding: 3,
+    color: BRANDTS.darkSec,
     marginVertical: 2,
+  },
+  loadingContainer:{
+    justifyContent: 'flex-start',
+    height: Layout.window.height * .3,
+    width: Layout.window.width * .6,
+  },
+  loadingText:{
+    fontSize: 22,
+    textAlign: 'center',
   },
   input:{
     borderBottomWidth: 2,
-    width: Layout.window.width * .5,
+    width: Layout.window.width * .65,
     height: 35,
     fontSize: 20,
-    paddingHorizontal: 10,
-    color: BRANDTS.three,
+    paddingHorizontal: 5,
+    color: BRANDTS.light,
     marginVertical: 5,
   },
   closeButton:{
     position: 'absolute',
-    top: 5,
+    top: 2,
     left: 5,
+    paddingHorizontal:10,
+  },
+  mapContainer:{
+    height: Layout.window.height * .3,
+    width: Layout.window.width * .65,
   },
   coordinates:{
+    marginVertical: 5,
+    borderWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
   },
-  latlng:{
-    width: Layout.window.width * .25,
-    paddingHorizontal: 2,
-    marginHorizontal: 5,
-  },
-  picker:{ 
-    height: 50, 
+  picker:{
+    marginVertical: 5,
+    height: 40, 
     width: 100,
-    backgroundColor: BRANDTS.three,
-    color: BRANDTS.two,
-    borderRadius:15,
-    borderWidth:1,
+    backgroundColor: 'transparent',
+    color: BRANDTS.dark,
   },
+  smallModal:{
+    height: Layout.window.height * .5, 
+    marginTop: Layout.window.height * .1,
+  }
   });
   

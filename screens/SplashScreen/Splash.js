@@ -1,8 +1,10 @@
 import React from "react";
-import { StyleSheet, Animated, Easing } from "react-native";
+import { StyleSheet, Animated, Easing, Image } from "react-native";
 import {createAnimation, createInterpolate} from '../../components/Animation'
 import { BRANDTS } from "../../constants/Colors";
 import { MonoText } from "../../components/StyledText";
+import { LinearGradient } from "expo";
+import Layout from '../../constants/Layout';
 
 export default class Splash extends React.Component {
   constructor(props) {
@@ -33,14 +35,24 @@ export default class Splash extends React.Component {
     const xSubtitleFall = createInterpolate(xValueSubtitle,[0, 1],['65%','0%']);
 
     return (
-      <Animated.View style={[styles.container, { opacity: this.state.opacity }]}>
-        <Animated.View style={{top: yTitleFall, transform: [{rotate: spinTitle}]}}>
-            <MonoText style={styles.title}>MyLocations</MonoText>
-        </Animated.View>
-        <Animated.View style={{left: xSubtitleFall, transform: [{rotate: spinSubtitle}]}}>
-            <MonoText style={styles.subtitle}>Welldone</MonoText>
-        </Animated.View>
-    </Animated.View>
+      <LinearGradient
+      colors={[BRANDTS.primary, BRANDTS.primarySec, BRANDTS.light]}
+      style={{flex:1}}
+      start={[0, 0]}
+      end={[1, 1]}>
+        <Animated.View style={[styles.container,{ opacity: this.state.opacity }]}>
+          <Animated.View style={{top: yTitleFall, transform: [{rotate: spinTitle}]}}>
+              <MonoText style={styles.title}>MyLocations</MonoText>
+          </Animated.View>
+          <Animated.View style={{left: xSubtitleFall, transform: [{rotate: spinSubtitle}]}}>
+              <MonoText style={styles.subtitle}>Welldone</MonoText>
+          </Animated.View>
+          <Image
+            source={require('../../assets/images/icon.png')}
+            style={styles.logo}
+            />
+      </Animated.View>
+    </LinearGradient>
     );
   }
 }
@@ -48,17 +60,22 @@ export default class Splash extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BRANDTS.two,
     justifyContent: "center",
     alignItems: "center"
   },
   title: {
     fontSize: 52,
-    color: BRANDTS.three,
+    color: BRANDTS.light,
     fontWeight: "500"
   },
   subtitle: {
     fontSize: 26,
-    color: BRANDTS.one
-  }
+    color: BRANDTS.darkSec
+  },
+  logo:{
+    height: Layout.window.height * .22,
+    width: Layout.window.width * .34,
+    position: 'absolute',
+    top: Layout.window.height * .6,
+  },
 });

@@ -1,32 +1,25 @@
 import React from 'react';
-import { StyleSheet, View, FlatList, TouchableOpacity, Platform } from "react-native";
+import { StyleSheet, View, FlatList, TouchableOpacity, ScrollView, Image } from "react-native";
 import { MonoText } from '../../components/StyledText';
 import { BRANDTS } from "../../constants/Colors";
 import Layout from '../../constants/Layout';
-import { Ionicons } from '@expo/vector-icons';
 import { ModalStyled } from '../../components/StyledModal';
 
 const CategoryItem = (props) => (
-    <View style={[styles.flatview,{backgroundColor: props.index%2? BRANDTS.four : BRANDTS.three,}]}>
+    <View style={[styles.categoryItem,{backgroundColor: props.index%2? BRANDTS.lightSec : BRANDTS.light,}]}>
         <View/>
-        <MonoText style={styles.categotyText}>
-        {props.item.name}
-        </MonoText>
+        <MonoText style={styles.categotyText}>{props.item.name}</MonoText>
         <View style={styles.iconsConteiner}>
             <TouchableOpacity onPress={()=>props.editCategoryAction(props.item)}>
-                <Ionicons
-                name={Platform.OS === "ios" ? "ios-create" : "md-create"}
-                size={35}
-                color={BRANDTS.one}
-                style={{paddingRight:7.5}}
+                <Image
+                source={require('../../assets/images/pencil-case.png')}
+                style={styles.icon}
                 />
             </TouchableOpacity>
             <TouchableOpacity onPress={()=>props.deleteCategoryHandle(props.item)}>
-                <Ionicons
-                name={Platform.OS === "ios" ? "ios-trash" : "md-trash"}
-                size={35}
-                color={BRANDTS.one}
-                style={{paddingLeft: 7.5}}
+            <Image
+                source={require('../../assets/images/trash.png')}
+                style={styles.icon}
                 />
             </TouchableOpacity>
         </View>
@@ -54,22 +47,24 @@ class CategoriesView extends React.Component {
         return (
             <View style={styles.container}>
                 { categories.length === 0 ? <MonoText style={[styles.subtitle,{
-                color: BRANDTS.three,
-                borderLeftColor: BRANDTS.four}]}>
+                color: BRANDTS.light,
+                borderLeftColor: BRANDTS.lightSec}]}>
                 No Categories Found{'\n'}Add by clicking the button above
                 </MonoText>
                 :
-                <FlatList
-                data={categories}
-                keyExtractor={item => item.name}
-                renderItem={({item,index}) =>
-                    <CategoryItem 
-                    item={item} 
-                    index ={index} 
-                    deleteCategoryHandle={deleteCategoryHandle}
-                    editCategoryAction={this.editCategoryShow}/>
-                }
-                />
+                <ScrollView>
+                    <FlatList
+                    data={categories}
+                    keyExtractor={item => item.name}
+                    renderItem={({item,index}) =>
+                        <CategoryItem 
+                        item={item} 
+                        index ={index} 
+                        deleteCategoryHandle={deleteCategoryHandle}
+                        editCategoryAction={this.editCategoryShow}/>
+                    }
+                    />
+                </ScrollView>
                 }
                 {this.state.modalVisible &&
                 <ModalStyled 
@@ -94,16 +89,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 5
   },
-  flatview:{
-    width: Layout.window.width,
+  categoryItem:{
     flexDirection: 'row',
     justifyContent: 'space-around',
-    borderLeftWidth: 10,
-    borderLeftColor: BRANDTS.one,
-    borderRightWidth: 10,
-    borderRightColor: BRANDTS.one,
+    alignItems: 'center',
+    width: Layout.window.width * .9,
+    borderWidth: 4,
+    borderRadius: 5,
+    borderColor: BRANDTS.dark,
     paddingVertical: 10,
-    paddingHorizontal: 2,
+    paddingHorizontal: 5,
     marginBottom: 5,
   },
   subtitle: {
@@ -113,12 +108,19 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   categotyText: {
-    fontSize: 28,
-    fontWeight: "500",
+    fontSize: 24,
     textAlign: 'center',
-    color: BRANDTS.two,
+    paddingBottom: 10,
+    color: BRANDTS.dark,
   },
   iconsConteiner:{
     flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  icon:{
+    padding: 5,
+    height: 40,
+    width: 40,
   },
 });

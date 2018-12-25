@@ -1,16 +1,15 @@
 import React from "react";
-import { TouchableOpacity, View, Platform, StyleSheet } from "react-native";
-import { MonoText } from "../components/StyledText";
-import { BRANDTS } from "../constants/Colors";
-import { Constants } from "expo";
-import { Ionicons } from '@expo/vector-icons';
-import Layout from '../constants/Layout';
-import { Types } from '../constants/Enums';
-import {ModalStyled} from './StyledModal';
+import { TouchableOpacity, View, Platform, StyleSheet, Image } from "react-native";
+import { Constants, LinearGradient } from "expo";
 import { connect } from 'react-redux';
 import {addCategory} from '../store/modules/categories/categoriesActions';
 import {addLocation} from '../store/modules/locations/locationsActions';
+import { MonoText } from "../components/StyledText";
 import Toast from 'react-native-simple-toast';
+import {ModalStyled} from './StyledModal';
+import { BRANDTS } from "../constants/Colors";
+import Layout from '../constants/Layout';
+import { Types } from '../constants/Enums';
 
 class Header extends React.Component {
   state={ modalVisible: false };
@@ -40,28 +39,31 @@ class Header extends React.Component {
     return (
       <View>
         <View style={styles.statusBar}/>
-        <View style={styles.container}>
-        {backOption ? 
+        <LinearGradient
+        colors={[BRANDTS.primary, BRANDTS.primarySec, BRANDTS.light]}
+        style={styles.container}
+        start={[0, 0]}
+        end={[1, .75]}
+        >
+          {backOption ? 
           <TouchableOpacity onPress={navigation.goBack()}>
-            <MonoText style={{ color: BRANDTS.one, fontSize: 18 }}>Back</MonoText>
+            <MonoText style={{ color: BRANDTS.dark, fontSize: 18 }}>Back</MonoText>
           </TouchableOpacity>
           :
           <View/>
-        }
+          }
           <MonoText style={styles.title}>{title}</MonoText>
           {addIcon && 
-          <TouchableOpacity onPress={this.setModalVisibleHandle}>
-            <Ionicons
-            name={Platform.OS === "ios" ? "ios-add-circle" : "md-add-circle"}
-            size={45}
-            style={{}}
-            color={BRANDTS.one}
+            <TouchableOpacity onPress={this.setModalVisibleHandle}>
+            <Image
+            source={require('../assets/images/add-item.png')}
+            style={styles.icon}
             />
           </TouchableOpacity>
           }
-        </View>
+          </LinearGradient>
         {this.state.modalVisible &&
-        <ModalStyled 
+        <ModalStyled
         modalVisible={this.state.modalVisible} 
         type={title}
         action={'Add'}
@@ -89,20 +91,28 @@ export default connect(mapStateToProps,mapActionsToProps)(Header)
 
 const styles = StyleSheet.create({
   container: {
-  backgroundColor: BRANDTS.two,
+  backgroundColor: BRANDTS.primary,
   paddingVertical: 5,
   paddingHorizontal: 15,
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
-  height: Layout.window.height * 0.1
+  height: Layout.window.height * 0.1,
+  borderBottomWidth: 2,
+  borderBottomColor: BRANDTS.lightSec,
   },
   statusBar:{
-    backgroundColor: BRANDTS.two,
+    backgroundColor: BRANDTS.primarySec,
     height: Constants.statusBarHeight
   },
   title:{ 
-    color: BRANDTS.one, 
+    color: BRANDTS.darkSec, 
     fontSize: 26 
+  },
+  icon:{
+    padding: 5,
+    height: 45,
+    width: 45,
+    marginHorizontal: 3,
   },
 });

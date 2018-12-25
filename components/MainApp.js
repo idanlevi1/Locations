@@ -11,7 +11,7 @@ export default class MainApp extends React.Component {
   componentDidMount() {
     setTimeout(() => {
       this.setState({ splash: false });
-    }, 100);
+    }, 2500);
   }
 
   render() {

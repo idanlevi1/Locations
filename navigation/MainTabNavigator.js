@@ -11,14 +11,14 @@ export default (BottomTabNavigator = createBottomTabNavigator(
   {
     tabBarOptions: {
       style: {
-        backgroundColor: BRANDTS.one,
+        backgroundColor: BRANDTS.dark,
         borderWidth: 2,
-        borderColor:BRANDTS.four,
+        borderColor:BRANDTS.lightSec,
         height: Layout.window.height * 0.1,
         padding:2,
       },
-      activeTintColor: BRANDTS.two,
-      inactiveTintColor: BRANDTS.three
+      activeTintColor: BRANDTS.primary,
+      inactiveTintColor: BRANDTS.light
     }
   }
 ));

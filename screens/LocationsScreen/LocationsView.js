@@ -1,51 +1,41 @@
 import React from 'react';
-import { StyleSheet, View, FlatList, TouchableOpacity, Platform, Vibration, Picker, ScrollView } from "react-native";
+import { StyleSheet, View, FlatList, TouchableOpacity, Platform, Vibration, Picker, ScrollView, Image } from "react-native";
 import { MonoText } from '../../components/StyledText';
 import { BRANDTS } from "../../constants/Colors";
 import Layout from '../../constants/Layout';
 import { ModalStyled } from '../../components/StyledModal';
-import { Ionicons } from '@expo/vector-icons';
 import {ModalDetails} from '../../components/DetailsModal';
 import groupBy from 'lodash/groupBy';
+import { SortTypes } from '../../constants/Enums';
 
-const DURATION = 1000;
+const VIBRATION_DORATION = 1000;
 
 const LocationItem = (props) => (
-    <View style={[styles.flatview,{backgroundColor: props.index%2? BRANDTS.four : BRANDTS.three,}]}>
+    <View style={[styles.locationItem,{backgroundColor: props.index%2? BRANDTS.lightSec : BRANDTS.light,}]}>
+      <MonoText style={styles.locationText}>{props.item.name}</MonoText>
       <View style={styles.iconsConteiner}>
         <TouchableOpacity onPress={()=>props.onShowModalAction(props.item, 'map')}>
-          <Ionicons
-          name={Platform.OS === "ios" ? "ios-navigate" : "md-navigate"}
-          size={35}
-          color={BRANDTS.one}
-          style={{paddingRight:7.5}}
+          <Image
+          source={require('../../assets/images/navigation.png')}
+          style={styles.icon}
           />
         </TouchableOpacity>
         <TouchableOpacity onPress={()=>props.onShowModalAction(props.item, 'details')}>
-          <Ionicons
-          name={Platform.OS === "ios" ? "ios-information-circle" : "md-information-circle"}
-          size={35}
-          color={BRANDTS.one}
-          style={{paddingLeft: 7.5}}
+          <Image
+          source={require('../../assets/images/question.png')}
+          style={styles.icon}
           />
         </TouchableOpacity>
-      </View>
-      <MonoText style={styles.locationText}>{props.item.name}</MonoText>
-      <View style={styles.iconsConteiner}>
         <TouchableOpacity onPress={()=>props.onShowModalAction(props.item, 'edit')}>
-          <Ionicons
-          name={Platform.OS === "ios" ? "ios-create" : "md-create"}
-          size={35}
-          color={BRANDTS.one}
-          style={{paddingRight:7.5}}
+          <Image
+          source={require('../../assets/images/pencil-case.png')}
+          style={styles.icon}
           />
         </TouchableOpacity>
         <TouchableOpacity onPress={()=>props.deleteLocationHandle(props.item)}>
-          <Ionicons
-          name={Platform.OS === "ios" ? "ios-trash" : "md-trash"}
-          size={35}
-          color={BRANDTS.one}
-          style={{paddingLeft: 7.5}}
+          <Image
+          source={require('../../assets/images/trash.png')}
+          style={styles.icon}
           />
         </TouchableOpacity>
       </View>
@@ -59,12 +49,12 @@ class LocationsView extends React.Component {
     modalDetailsVisible: false,
     modalType: null,
     handledLocationList: [],
-    sortListType: 'A-Z',
+    sortListType: SortTypes.ALPHABET_UP,
     groupedByCategory: false,
   };
 
   componentDidMount = () => {
-    this.locationListSort('A-Z');
+    this.locationListSort(SortTypes.ALPHABET_UP);
   }
 
   componentDidUpdate(prevProps){
@@ -84,7 +74,7 @@ class LocationsView extends React.Component {
     if(type === 'edit')
       this.setModalActionVisibleHandle();
     else{
-      Vibration.vibrate(DURATION)
+      Vibration.vibrate(VIBRATION_DORATION)
       this.setState({modalType: type});
       this.setmodalDetailsVisibleHandle();
     }
@@ -97,9 +87,9 @@ class LocationsView extends React.Component {
 
   locationListSort = (type) => {
     let sortedList = this.props.locations;
-    if(type === 'A-Z')
+    if(type === SortTypes.ALPHABET_UP)
       sortedList = this.props.locations.sort((a,b)=>a.name.toLowerCase()>b.name.toLowerCase())
-    if(type === 'Z-A'){
+    if(type === SortTypes.ALPHABET_DOWN){
       sortedList = this.props.locations.sort((a,b)=>a.name.toLowerCase()<b.name.toLowerCase())
     }
     this.setState({handledLocationList:sortedList})
@@ -109,7 +99,7 @@ class LocationsView extends React.Component {
     const groupByCategory = groupBy(this.state.handledLocationList, 'category');
     return Object.keys(groupByCategory).map(category=> 
       <React.Fragment key={category}>
-        <MonoText style={styles.subtitle}>{category}</MonoText>
+        <MonoText style={styles.groupTitle}>{category}</MonoText>
         <FlatList
         data={groupByCategory[category]}
         extraData={this.state}
@@ -130,8 +120,8 @@ class LocationsView extends React.Component {
         <View style={styles.container}>
             { locations.length === 0 ? <MonoText style={[styles.subtitle,{
             paddingVertical:20,
-            color: BRANDTS.three,
-            borderLeftColor: BRANDTS.four}]}>
+            color: BRANDTS.light,
+            borderLeftColor: BRANDTS.lightSec}]}>
             No Locations Found{'\n'}Add by clicking the button above
             </MonoText>
             :
@@ -142,8 +132,8 @@ class LocationsView extends React.Component {
                 style={styles.picker}
                 selectedValue={this.state.sortListType}
                 onValueChange={value => {this.setState({sortListType:value}); this.locationListSort(value)}}>
-                  <Picker.Item key={'A-Z'} label={'A-Z'} value={'A-Z'}/>
-                  <Picker.Item key={'Z-A'} label={'Z-A'} value={'Z-A'}/>
+                  <Picker.Item key={SortTypes.ALPHABET_UP} label={SortTypes.ALPHABET_UP} value={SortTypes.ALPHABET_UP}/>
+                  <Picker.Item key={SortTypes.ALPHABET_DOWN} label={SortTypes.ALPHABET_DOWN} value={SortTypes.ALPHABET_DOWN}/>
                 </Picker>
                 <MonoText style={styles.subtitle}>Group BY Category</MonoText>
                 <Picker
@@ -208,44 +198,53 @@ const styles = StyleSheet.create({
   },
   filtersLine:{
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BRANDTS.four,
-  },
-  flatview:{
-    width: Layout.window.width,
-    flexDirection: 'row',
     justifyContent: 'space-around',
-    borderLeftWidth: 10,
-    borderLeftColor: BRANDTS.one,
-    borderRightWidth: 10,
-    borderRightColor: BRANDTS.one,
+    alignItems: 'center',
+  },
+  locationItem:{
+    width: Layout.window.width * .9,
+    borderWidth: 4,
+    borderRadius: 5,
+    borderColor: BRANDTS.dark,
     paddingVertical: 10,
-    paddingHorizontal: 2,
+    paddingHorizontal: 25,
     marginBottom: 5,
   },
+  locationText: {
+    fontSize: 22,
+    textAlign: 'center',
+    paddingBottom: 10,
+    color: BRANDTS.dark,
+  },
+  iconsConteiner:{
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  icon:{
+    padding: 5,
+    height: 40,
+    width: 40,
+  },
+  groupTitle:{
+    fontSize: 24,
+    textAlign: 'center',
+    marginVertical: 5,
+    paddingHorizontal:2,
+    color: BRANDTS.primary,
+  },
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "500",
     textAlign: 'center',
     marginVertical: 5,
     paddingHorizontal:2,
   },
-  locationText: {
-    fontSize: 20,
-    fontWeight: "500",
-    textAlign: 'center',
-    color: BRANDTS.two,
-  },
-  iconsConteiner:{
-    flexDirection: 'row',
-  },
   picker:{ 
     height: 50, 
     width: 50,
-    backgroundColor: BRANDTS.one,
-    color: BRANDTS.two,
-    borderRadius:15,
-    borderWidth:1,
+    backgroundColor: '#FFF',
+    color: BRANDTS.primarySec,
+    padding: 5,
   },
 });

@@ -22,10 +22,13 @@ export const QED_Group = {
 }
 
 export const BRANDTS = {
-  one: '#252839',
-  two: '#f2b632',
-  three: '#677077',
-  four: '#b5b5b7',
+  dark: '#252839',
+  darkSec: '#173e43',
+  primary: '#f2b632',
+  primarySec: '#e6af4b',
+  light: '#677077',
+  lightSec: '#b5b5b7',
+  
 }
 
 export const Flamingo = {
@@ -36,10 +39,10 @@ export const Flamingo = {
 }
 
 export const Colors = {
-  tintColor: BRANDTS.two,
-  tabIconDefault: BRANDTS.four,
-  tabIconSelected: BRANDTS.two,
-  tabBar: BRANDTS.two,
+  tintColor: BRANDTS.primary,
+  tabIconDefault: BRANDTS.lightSec,
+  tabIconSelected: BRANDTS.primary,
+  tabBar: BRANDTS.primary,
   errorBackground: 'red',
   errorText: '#fff',
   warningBackground: '#EAEB5E',
