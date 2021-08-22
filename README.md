@@ -1,8 +1,13 @@
 # MyLocations 📍🗺️🚩
-#### MyLocations 📍🗺️ 🚩 React Native (Expo) & Redux ⚛
+### React Native (Expo) & Redux ⚛
+* You can save locations (with Google Maps)
+* Add details - name, address and categoty
+* Control on categories
+* Sort locations
+* GroubBy locations
 
 installation:
-    `npm install`
+    `npm install` or `yarn`
 
 run:
     `expo start`
