@@ -1,5 +1,5 @@
 # MyLocations 📍🗺️🚩
-*MyLocations 📍🗺️ 🚩 React Native (Expo) & Redux ⚛*
+#### MyLocations 📍🗺️ 🚩 React Native (Expo) & Redux ⚛
 
 installation:
     `npm install`
